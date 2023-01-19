@@ -1,0 +1,60 @@
+/*** Definition Section ***/
+%{
+#include "sspascal.tab.h"
+%}
+
+%option noyywrap
+%option caseless
+
+REAL_NUMBER  [+-]?(0|[1-9][0-9]*)(\.[0-9]+)?
+IDENTIFIER   [a-z][a-z0-9_]*
+STRING       \".*\"
+DELIMIT_1	[;.,:]
+OPERATOR_1	[+*/()<>=]|"-"|"["|"]"|"{"|"}"
+COMENT		"//"
+SIR_CAR        ["][^\n"]*["]
+CARACTER	"'"[^\n]"'"
+/*** Rule Section ***/
+%%
+					/* yytext is the text in the buffer */
+list                                   {return list;}
+char				        {return character;}
+begin				        {return begin;}
+else					{return else;}
+if                                  	{return if;}
+while                                  {return while; }
+for                                    {return for;}
+forall                                 {return forall; }
+int                                    {return int; }
+of                                     {return of; }
+program                                {return program; }
+then                                   {return then }
+var                                    {return var; }
+write                                  {return write; }
+green                                  {return green; }
+red					{return red;}
+between 				{return between; }
+flag                                   {return flag; }
+string					{return string; }
+float					{return float; }
+is                                      {return is; }
+
+
+{IDENTIFIER}	{return identifier;}
+{REAL_NUMBER}    {return real;}
+{STRING}        {return string;}
+
+{CARACTER}	{
+	yylval.p_val = yytext;
+	return constant;
+		}
+{SIR_CAR}	{return special_character;}
+
+{DELIMIT_1}	{return yytext[0];}
+{OPERATOR_1}	{return yytext[0];}
+
+[\n]					{ ++lineNumber; }
+[ \t\n]+             			{ ; }
+.                			{ errorFound = 1; printf("Illegal token %s at line %d !", yytext, lineNumber); 
+%%
+
